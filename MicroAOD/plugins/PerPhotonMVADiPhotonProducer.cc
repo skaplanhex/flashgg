@@ -41,8 +41,10 @@ namespace flashgg {
             computer_.update( evt );
             for( auto dipho : *input ) {
                 dipho.makePhotonsPersistent();
-                computer_.fill( dipho.getLeadingPhoton() );
-                computer_.fill( dipho.getSubLeadingPhoton() );
+                flashgg::Photon p;
+                flashgg::Photon p2;
+                computer_.fill( p );
+                computer_.fill( p2 );
                 output->push_back( dipho );
             }
             evt.put( std::move( output ) );

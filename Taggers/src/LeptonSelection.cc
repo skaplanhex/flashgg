@@ -482,9 +482,10 @@ namespace flashgg {
                                                       double NumOfMissingHitsThreshold, vector<double> EtaCuts, double deltaRPhoElectronThreshold, double DeltaRTrkElec,
                                                       double deltaMassElectronZThreshold ){
  
-        std::vector<const flashgg::Photon *> photons;        
-        photons.push_back( dipho->leadingPhoton() );
-        photons.push_back( dipho->subLeadingPhoton() );
+        std::vector<const flashgg::Photon *> photons;
+        const flashgg::Photon* p = new flashgg::Photon();       
+        photons.push_back( p );
+        photons.push_back( p );
         
         std::vector<edm::Ptr<flashgg::Electron> > goodElectrons;
         std::vector<edm::Ptr<flashgg::Electron> > allGoodElectrons=selectAllElectrons( ElectronPointers, vertexPointers , ElectronPtThreshold, 
@@ -506,9 +507,10 @@ namespace flashgg {
                                                          double deltaRPhoElectronThreshold, double DeltaRTrkElec, double deltaMassElectronZThreshold,
                                                          double rho, bool isData){
  
-        std::vector<const flashgg::Photon *> photons;        
-        photons.push_back( dipho->leadingPhoton() );
-        photons.push_back( dipho->subLeadingPhoton() );
+        std::vector<const flashgg::Photon *> photons;
+        const flashgg::Photon* p = new flashgg::Photon();        
+        photons.push_back( p );
+        photons.push_back( p );
         
         std::vector<edm::Ptr<flashgg::Electron> > goodElectrons;        
         std::vector<edm::Ptr<flashgg::Electron> > allGoodElectrons=selectStdAllElectrons( ElectronPointers, vertexPointers , 
@@ -532,9 +534,10 @@ namespace flashgg {
                                                            double TransverseImpactParam_EB, double LongitudinalImpactParam_EB, double TransverseImpactParam_EE, double LongitudinalImpactParam_EE,
                                                            double rho, bool isData){
  
-        std::vector<const flashgg::Photon *> photons;        
-        photons.push_back( dipho->leadingPhoton() );
-        photons.push_back( dipho->subLeadingPhoton() );
+        std::vector<const flashgg::Photon *> photons;
+        const flashgg::Photon* p = new flashgg::Photon();        
+        photons.push_back( p );
+        photons.push_back( p );
         
         std::vector<edm::Ptr<flashgg::Electron> > goodElectrons;        
         std::vector<edm::Ptr<flashgg::Electron> > allGoodElectrons=selectAllElectronsSum16( ElectronPointers, vertexPointers , 
@@ -557,8 +560,9 @@ namespace flashgg {
 
         // for ttH hadronic tag zero leptons cut
         std::vector<const flashgg::Photon *> photons;        
-        photons.push_back( dipho->leadingPhoton() );
-        photons.push_back( dipho->subLeadingPhoton() );
+        const flashgg::Photon* p = new flashgg::Photon();        
+        photons.push_back( p );
+        photons.push_back( p );
         
         std::vector<edm::Ptr<flashgg::Electron> > goodElectrons;
 
@@ -583,8 +587,9 @@ namespace flashgg {
         double Zmass_ = 91.9;
         
         std::vector<const flashgg::Photon *> photons;        
-        photons.push_back( diphoton->leadingPhoton() );
-        photons.push_back( diphoton->subLeadingPhoton() );
+        const flashgg::Photon* p = new flashgg::Photon();        
+        photons.push_back( p );
+        photons.push_back( p );
         
         TLorentzVector elec_p4;
         elec_p4.SetXYZT( electron->px(), electron->py(), electron->pz(), electron->energy() );

@@ -364,10 +364,10 @@ namespace flashgg {
 
             VHLeptonicLooseTag VHLeptonicLooseTags_obj( dipho, mvares );
             VHLeptonicLooseTags_obj.includeWeights( *dipho );
-            if( dipho->leadingPhoton()->pt() < ( dipho->mass() )*leadPhoOverMassThreshold_ ) { continue; }
-            if( dipho->subLeadingPhoton()->pt() < ( dipho->mass() )*subleadPhoOverMassThreshold_ ) { continue; }
-            idmva1 = dipho->leadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() );
-            idmva2 = dipho->subLeadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() );
+            if( 0. < ( dipho->mass() )*leadPhoOverMassThreshold_ ) { continue; }
+            if( 0. < ( dipho->mass() )*subleadPhoOverMassThreshold_ ) { continue; }
+            idmva1 = 0.;
+            idmva2 = 0.;
             if( idmva1 <= PhoMVAThreshold_ || idmva2 <= PhoMVAThreshold_ ) { continue; }
             if( mvares->result < MVAThreshold_ ) { continue; }
 

@@ -1,6 +1,5 @@
 #include "flashgg/MicroAOD/interface/VertexSelectorBase.h"
 #include "DataFormats/Common/interface/Handle.h"
-#include "flashgg/DataFormats/interface/Photon.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/EgammaCandidates/interface/Photon.h"
@@ -26,7 +25,7 @@ namespace flashgg {
     public:
         LegacyVertexSelector( const edm::ParameterSet & );
         ~LegacyVertexSelector();
-        edm::Ptr<reco::Vertex> select( const edm::Ptr<flashgg::Photon> &, const edm::Ptr<flashgg::Photon> &, const std::vector<edm::Ptr<reco::Vertex> > &,
+        edm::Ptr<reco::Vertex> select( const edm::Ptr<pat::Photon> &, const edm::Ptr<pat::Photon> &, const std::vector<edm::Ptr<reco::Vertex> > &,
                                        const VertexCandidateMap &vertexCandidateMap,
                                        const std::vector<edm::Ptr<reco::Conversion> > &,
                                        const std::vector<edm::Ptr<reco::Conversion> > &,
@@ -35,7 +34,7 @@ namespace flashgg {
                                      ) override;
 
         // for gamma+jets studies
-        edm::Ptr<reco::Vertex> select( const edm::Ptr<flashgg::Photon> &, const edm::Ptr<pat::Jet> &, const std::vector<edm::Ptr<reco::Vertex> > &,
+        edm::Ptr<reco::Vertex> select( const edm::Ptr<pat::Photon> &, const edm::Ptr<pat::Jet> &, const std::vector<edm::Ptr<reco::Vertex> > &,
                                        const VertexCandidateMap &vertexCandidateMap,
                                        const std::vector<edm::Ptr<reco::Conversion> > &,
                                        const std::vector<edm::Ptr<reco::Conversion> > &,
@@ -47,23 +46,23 @@ namespace flashgg {
         void writeInfoFromLastSelectionTo( flashgg::DiPhotonCandidate & ) override;
         void writeInfoFromLastSelectionTo( flashgg::PhotonJetCandidate & ) override;
 
-        double vtxZFromConvOnly( const edm::Ptr<flashgg::Photon> &, const edm::Ptr<reco::Conversion> &, const math::XYZPoint & ) const;
-        double vtxZFromConvSuperCluster( const edm::Ptr<flashgg::Photon> &, const edm::Ptr<reco::Conversion> &, const math::XYZPoint & ) const;
-        double vtxZFromConv( const edm::Ptr<flashgg::Photon> &, const edm::Ptr<reco::Conversion> &, const math::XYZPoint & ) const;
-        double vtxDZFromConv( const edm::Ptr<flashgg::Photon> &, const edm::Ptr<reco::Conversion> & ) const;
+        double vtxZFromConvOnly( const edm::Ptr<pat::Photon> &, const edm::Ptr<reco::Conversion> &, const math::XYZPoint & ) const;
+        double vtxZFromConvSuperCluster( const edm::Ptr<pat::Photon> &, const edm::Ptr<reco::Conversion> &, const math::XYZPoint & ) const;
+        double vtxZFromConv( const edm::Ptr<pat::Photon> &, const edm::Ptr<reco::Conversion> &, const math::XYZPoint & ) const;
+        double vtxDZFromConv( const edm::Ptr<pat::Photon> &, const edm::Ptr<reco::Conversion> & ) const;
 
-        double zFromConvPair( const edm::Ptr<flashgg::Photon> &, const edm::Ptr<flashgg::Photon> &,
+        double zFromConvPair( const edm::Ptr<pat::Photon> &, const edm::Ptr<pat::Photon> &,
                               const int , const int, const int, const int,
                               const std::vector<edm::Ptr<reco::Conversion> > &,
                               const std::vector<edm::Ptr<reco::Conversion> > &,
                               const math::XYZPoint & ) const;
 
-        double sZFromConvPair( const edm::Ptr<flashgg::Photon> &, const edm::Ptr<flashgg::Photon> &,
+        double sZFromConvPair( const edm::Ptr<pat::Photon> &, const edm::Ptr<pat::Photon> &,
                                const int , const int, const int, const int,
                                const std::vector<edm::Ptr<reco::Conversion> > &,
                                const std::vector<edm::Ptr<reco::Conversion> > & ) const;
 
-        std::vector<int> IndexMatchedConversion( const edm::Ptr<flashgg::Photon> &, const std::vector<edm::Ptr<reco::Conversion> > &,
+        std::vector<int> IndexMatchedConversion( const edm::Ptr<pat::Photon> &, const std::vector<edm::Ptr<reco::Conversion> > &,
                 const std::vector<edm::Ptr<reco::Conversion> > &, bool ) const;
 
         void Initialize();
@@ -206,7 +205,7 @@ namespace flashgg {
         delete VertexProbMva_;
     }
 
-    double LegacyVertexSelector::vtxZFromConvOnly( const edm::Ptr<flashgg::Photon> &pho, const edm::Ptr<reco:: Conversion> &conversion,
+    double LegacyVertexSelector::vtxZFromConvOnly( const edm::Ptr<pat::Photon> &pho, const edm::Ptr<reco:: Conversion> &conversion,
             const math::XYZPoint &beamSpot ) const
     {
         double dz = 0;
@@ -227,7 +226,7 @@ namespace flashgg {
         return dz + beamSpot.z();
     }
 
-    double LegacyVertexSelector::vtxZFromConvSuperCluster( const edm::Ptr<flashgg::Photon> &pho, const edm::Ptr<reco:: Conversion> &conversion,
+    double LegacyVertexSelector::vtxZFromConvSuperCluster( const edm::Ptr<pat::Photon> &pho, const edm::Ptr<reco:: Conversion> &conversion,
             const math::XYZPoint &beamSpot ) const
     {
         // get the z from conversion plus SuperCluster
@@ -245,7 +244,7 @@ namespace flashgg {
         return higgsZ;
     }
 
-    double LegacyVertexSelector::vtxZFromConv( const edm::Ptr<flashgg::Photon> &pho, const edm::Ptr<reco::Conversion> &conversion,
+    double LegacyVertexSelector::vtxZFromConv( const edm::Ptr<pat::Photon> &pho, const edm::Ptr<reco::Conversion> &conversion,
             const math::XYZPoint &beamSpot ) const
     {
         double ReturnValue = 0;
@@ -344,7 +343,7 @@ namespace flashgg {
 
 
 
-    double LegacyVertexSelector::vtxDZFromConv( const edm::Ptr<flashgg::Photon> &pho, const edm::Ptr<reco::Conversion> &conversion ) const
+    double LegacyVertexSelector::vtxDZFromConv( const edm::Ptr<pat::Photon> &pho, const edm::Ptr<reco::Conversion> &conversion ) const
     {
         double dz = -99999;
         double perp = sqrt( conversion->conversionVertex().x() * conversion->conversionVertex().x() + conversion->conversionVertex().y() *
@@ -390,8 +389,8 @@ namespace flashgg {
         return dz;
     }
 
-    double LegacyVertexSelector::zFromConvPair( const edm::Ptr<flashgg::Photon> &p1,
-            const edm::Ptr<flashgg::Photon> &p2,
+    double LegacyVertexSelector::zFromConvPair( const edm::Ptr<pat::Photon> &p1,
+            const edm::Ptr<pat::Photon> &p2,
             const int index_conversionLead,
             const int index_conversionTrail,
             const int nConvLegs_LeadPhoton,
@@ -449,8 +448,8 @@ namespace flashgg {
         return zconv;
     }
 
-    double LegacyVertexSelector::sZFromConvPair( const edm::Ptr<flashgg::Photon> &p1,
-            const edm::Ptr<flashgg::Photon> &p2,
+    double LegacyVertexSelector::sZFromConvPair( const edm::Ptr<pat::Photon> &p1,
+            const edm::Ptr<pat::Photon> &p2,
             int index_conversionLead,
             int index_conversionTrail,
             const int nConvLegs_LeadPhoton,
@@ -496,7 +495,7 @@ namespace flashgg {
         return szconv;
     }
 
-    std::vector<int> LegacyVertexSelector::IndexMatchedConversion( const edm::Ptr<flashgg::Photon> &g,
+    std::vector<int> LegacyVertexSelector::IndexMatchedConversion( const edm::Ptr<pat::Photon> &g,
             const std::vector<edm::Ptr<reco::Conversion> > &conversionsVector,  const std::vector<edm::Ptr<reco::Conversion> > &conversionsVectorSingleLeg,
             bool useSingleLeg ) const
     {
@@ -578,7 +577,7 @@ namespace flashgg {
         }
     }
 
-    edm::Ptr<reco::Vertex> LegacyVertexSelector::select( const edm::Ptr<flashgg::Photon> &g1, const edm::Ptr<flashgg::Photon> &g2,
+    edm::Ptr<reco::Vertex> LegacyVertexSelector::select( const edm::Ptr<pat::Photon> &g1, const edm::Ptr<pat::Photon> &g2,
             const std::vector<edm::Ptr<reco::Vertex> > &vtxs,
             const VertexCandidateMap &vertexCandidateMap,
             const std::vector<edm::Ptr<reco::Conversion> > &conversionsVector,
@@ -796,7 +795,7 @@ namespace flashgg {
     }
 
 
-    edm::Ptr<reco::Vertex> LegacyVertexSelector::select( const edm::Ptr<flashgg::Photon> &g1, const edm::Ptr<pat::Jet> &g2,
+    edm::Ptr<reco::Vertex> LegacyVertexSelector::select( const edm::Ptr<pat::Photon> &g1, const edm::Ptr<pat::Jet> &g2,
                                                          const std::vector<edm::Ptr<reco::Vertex> > &vtxs,
                                                          const VertexCandidateMap &vertexCandidateMap,
                                                          const std::vector<edm::Ptr<reco::Conversion> > &conversionsVector,
@@ -919,7 +918,7 @@ namespace flashgg {
 
             if( nConv != 0 ) {
                 
-                const edm::Ptr<flashgg::Photon> &dummyg2 = g1;
+                const edm::Ptr<pat::Photon> &dummyg2 = g1;
 
                 zconv = zFromConvPair( g1, dummyg2, IndexMatchedConversionLeadPhoton, IndexMatchedConversionTrailPhoton, nConvLegs_LeadPhoton, nConvLegs_TrailPhoton,
                                        conversionsVector, conversionsVectorSingleLeg, beamSpot );
@@ -1064,7 +1063,6 @@ namespace flashgg {
     }
 
 } // namespace flashgg
-
 
 DEFINE_EDM_PLUGIN( FlashggVertexSelectorFactory,
                    flashgg::LegacyVertexSelector,

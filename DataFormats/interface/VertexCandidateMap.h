@@ -6,6 +6,8 @@
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include <string>
 
+// SK: taken directly from flashgg/DataFormats/interface/VertexCandidateMap.h
+
 namespace flashgg {
     //  typedef std::map<edm::Ptr<reco::Vertex>,edm::PtrVector<pat::PackedCandidate> > VertexCandidateMap;
 
@@ -49,14 +51,7 @@ namespace flashgg {
     };
 
     void print_track_count( const VertexCandidateMap &, std::string );
+
 }
 
 #endif
-// Local Variables:
-// mode:c++
-// indent-tabs-mode:nil
-// tab-width:4
-// c-basic-offset:4
-// End:
-// vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
-

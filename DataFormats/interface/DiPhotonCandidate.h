@@ -4,7 +4,6 @@
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
 #include "DataFormats/Candidate/interface/ShallowCloneCandidate.h"
 #include "DataFormats/Candidate/interface/LeafCandidate.h"
-#include "flashgg/DataFormats/interface/Photon.h"
 #include "flashgg/DataFormats/interface/SinglePhotonView.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "flashgg/DataFormats/interface/WeightedObject.h"
@@ -18,16 +17,16 @@ namespace flashgg {
     {
     public:
         DiPhotonCandidate();
-        DiPhotonCandidate( edm::Ptr<flashgg::Photon>, edm::Ptr<flashgg::Photon>, edm::Ptr<reco::Vertex> );
+        DiPhotonCandidate( edm::Ptr<pat::Photon>, edm::Ptr<pat::Photon>, edm::Ptr<reco::Vertex> );
         ~DiPhotonCandidate();
 
         const edm::Ptr<reco::Vertex> vtx() const { return vertex_; }
 
-        const flashgg::Photon *leadingPhoton() const { return viewPho1_.photon(); };
-        const flashgg::Photon *subLeadingPhoton() const { return viewPho2_.photon(); }
+        const pat::Photon *leadingPhoton() const { return viewPho1_.photon(); };
+        const pat::Photon *subLeadingPhoton() const { return viewPho2_.photon(); }
 
-        flashgg::Photon &getLeadingPhoton() { return viewPho1_.getPhoton(); }
-        flashgg::Photon &getSubLeadingPhoton() { return viewPho2_.getPhoton(); };
+        pat::Photon &getLeadingPhoton() { return viewPho1_.getPhoton(); }
+        pat::Photon &getSubLeadingPhoton() { return viewPho2_.getPhoton(); };
 
         flashgg::SinglePhotonView &getLeadingView() { return viewPho1_; }
         flashgg::SinglePhotonView &getSubLeadingView() { return viewPho2_; }
@@ -86,13 +85,17 @@ namespace flashgg {
         int mvaSortedIndex( unsigned int iVtx ) const  { return iVtx < vmva_sortedindex_.size() ? vmva_sortedindex_.at( iVtx ) : -1; }
         edm::Ptr<reco::Vertex> vertexPtr( unsigned int iVtx ) const  { return iVtx < vVtxPtr_.size() ? vVtxPtr_.at( iVtx ) : edm::Ptr<reco::Vertex>(); }
 
-        float leadPhotonId() const { return leadingPhoton()->phoIdMvaDWrtVtx( vertex_ ); }
-        float subLeadPhotonId() const { return subLeadingPhoton()->phoIdMvaDWrtVtx( vertex_ ); }
+        // float leadPhotonId() const { return leadingPhoton()->phoIdMvaDWrtVtx( vertex_ ); }
+        // float subLeadPhotonId() const { return subLeadingPhoton()->phoIdMvaDWrtVtx( vertex_ ); }
+
+        // SK Note: changed these to dummy functions, but they're never used.  Just wanted everything to compile
+        float leadPhotonId() const { return 0.; }
+        float subLeadPhotonId() const { return 0.; }
 
         bool operator <( const DiPhotonCandidate &b ) const;
         bool operator >( const DiPhotonCandidate &b ) const;
 
-        //        math::XYZTLorentzVector PhoP4Corr( edm::Ptr<flashgg::Photon> ) const;
+        //        math::XYZTLorentzVector PhoP4Corr( edm::Ptr<pat::Photon> ) const;
 
         void computeP4AndOrder();
         void makePhotonsPersistent()

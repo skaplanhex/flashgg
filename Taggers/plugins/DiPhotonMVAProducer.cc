@@ -206,8 +206,8 @@ namespace flashgg {
             flashgg::DiPhotonMVAResult mvares;
             edm::Ptr<reco::Vertex> vtx = diPhotons->ptrAt( candIndex )->vtx();
 
-            const flashgg::Photon *g1 = diPhotons->ptrAt( candIndex )->leadingPhoton();
-            const flashgg::Photon *g2 = diPhotons->ptrAt( candIndex )->subLeadingPhoton();
+            const flashgg::Photon *g1 = new flashgg::Photon();
+            const flashgg::Photon *g2 = new flashgg::Photon();
 
             //used for photon resolution wrt to correct vertex//
             TVector3 Photon1Dir;

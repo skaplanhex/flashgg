@@ -33,10 +33,8 @@ namespace flashgg {
         float dijet_dipho_pt() const     { return dijet_dipho_pt_;    }
         float dijet_minDRJetPho() const  { return dijet_minDRJetPho_; }
         int triggerBit(int i) const      { return triggerBits_[i];    }
-        int genMatchLead() const         { return int (tag_->diPhoton()->leadingPhoton()->hasGenMatchType() && 
-                                                      (tag_->diPhoton()->leadingPhoton()->genMatchType() == 1)); }
-        int genMatchSubLead() const      { return int (tag_->diPhoton()->subLeadingPhoton()->hasGenMatchType() && 
-                                                      (tag_->diPhoton()->subLeadingPhoton()->genMatchType() == 1)); }
+        int genMatchLead() const         { return 0; }
+        int genMatchSubLead() const      { return 0; }
         
     private:        
         const flashgg::DiPhotonTagBase* tag_;

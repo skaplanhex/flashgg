@@ -135,8 +135,9 @@ namespace flashgg {
 
     void DiPhotonWithUpdatedPhoIdMVAProducer::storePhotonRegressions(flashgg::DiPhotonCandidate & diph, const std::string & label)
     {
-            storeRegression(diph.getLeadingPhoton(), label);
-            storeRegression(diph.getSubLeadingPhoton(), label);
+            flashgg::Photon p,p2;
+            storeRegression(p, label);
+            storeRegression(p2, label);
     }
 
     void DiPhotonWithUpdatedPhoIdMVAProducer::storeRegression(flashgg::Photon & ph, const std::string & label)
@@ -210,83 +211,7 @@ namespace flashgg {
         
         unique_ptr<std::vector<flashgg::DiPhotonCandidate> > out_obj( new std::vector<flashgg::DiPhotonCandidate>() );
 
-        for (const auto & obj : *objects) {
-            flashgg::DiPhotonCandidate *new_obj = obj.clone();
-            new_obj->makePhotonsPersistent();
-            // store reco energy for safety
-            new_obj->getLeadingPhoton().addUserFloat("reco_E", new_obj->getLeadingPhoton().energy());
-            new_obj->getSubLeadingPhoton().addUserFloat("reco_E", new_obj->getSubLeadingPhoton().energy());
-            // store reco regression
-            float leadE = 0., subleadE = 0.;
-            if( reRunRegression_ ) {
-                if( keepInitialEnergy_ ) {
-                    leadE = new_obj->leadingPhoton()->energy();
-                    subleadE = new_obj->subLeadingPhoton()->energy();
-                }
-                storePhotonRegressions(*new_obj, "reco");
-                if( reRunRegressionOnData_ || ! evt.isRealData() ) { updatePhotonRegressions(*new_obj); }
-                storePhotonRegressions(*new_obj, "beforeShShTransf");
-            }
-            
-            double leadCorrectedEtaWidth = 0., subLeadCorrectedEtaWidth = 0.;
-            if (not evt.isRealData() and correctInputs_) { 
-                leadCorrectedEtaWidth = correctPhoton(new_obj->getLeadingPhoton());
-                subLeadCorrectedEtaWidth = correctPhoton(new_obj->getSubLeadingPhoton());
-            }
-            if (not evt.isRealData() and doNon5x5transformation_) { 
-                correctPhoton_non5x5(new_obj->getLeadingPhoton());
-                correctPhoton_non5x5(new_obj->getSubLeadingPhoton());
-            }
-            if (not evt.isRealData() and  _doIsoCorrection ) {
-                float lead_iso = new_obj->getLeadingPhoton().pfPhoIso03();
-                float sublead_iso = new_obj->getSubLeadingPhoton().pfPhoIso03();
-                float lead_eta = new_obj->getLeadingPhoton().superCluster()->eta();
-                float sublead_eta = new_obj->getSubLeadingPhoton().superCluster()->eta();
-                if (this->debug_) {
-                    std::cout << "Doing Iso correction to lead (sublead) photon with eta,rho,iso: " << lead_eta << ", " << rhoFixedGrd << ", " << lead_iso;
-                    std::cout << " (" << sublead_eta << ", " << rhoFixedGrd << ", " << sublead_iso << ")" << std::endl;
-                }
-                float extra_lead = _isoCorrector->getExtra(fabs(lead_eta),rhoFixedGrd);
-                float extra_sublead = _isoCorrector->getExtra(fabs(sublead_eta),rhoFixedGrd);
-                new_obj->getLeadingPhoton().setpfPhoIso03(lead_iso+extra_lead);
-                new_obj->getSubLeadingPhoton().setpfPhoIso03(sublead_iso+extra_sublead);
-                if (this->debug_) {
-                    std::cout << " Final iso value for lead (sublead) photon: " << new_obj->getLeadingPhoton().pfPhoIso03() << " (" 
-                              << new_obj->getSubLeadingPhoton().pfPhoIso03() << ")" << std::endl;
-                }
-            }
-            double eA_leadPho = _effectiveAreas.getEffectiveArea( abs(new_obj->getLeadingPhoton().superCluster()->eta()) );
-            double eA_subLeadPho = _effectiveAreas.getEffectiveArea( abs(new_obj->getSubLeadingPhoton().superCluster()->eta()) );
-            
-            float leadpfPhoIso03Corr = phoTools_.computeCorrectPhoIso( new_obj->getLeadingPhoton(), rhoFixedGrd,  eA_leadPho, _phoIsoPtScalingCoeff, _phoIsoCutoff);
-            new_obj->getLeadingPhoton().setpfPhoIso03Corr(leadpfPhoIso03Corr);
-            float subleadpfPhoIso03Corr = phoTools_.computeCorrectPhoIso( new_obj->getSubLeadingPhoton(), rhoFixedGrd,  eA_subLeadPho, _phoIsoPtScalingCoeff, _phoIsoCutoff);
-            new_obj->getSubLeadingPhoton().setpfPhoIso03Corr(subleadpfPhoIso03Corr);
-            if (this->debug_) {
-                std::cout << "Isolation notcorr (corr) for lead, sublead" << new_obj->getLeadingPhoton().pfPhoIso03() << "," << new_obj->getSubLeadingPhoton().pfPhoIso03() << "(" << new_obj->getLeadingPhoton().pfPhoIso03Corr() << "," << new_obj->getSubLeadingPhoton().pfPhoIso03Corr() << ")" << std::endl;
-            }
-            if (this->debug_) {
-                std::cout << " Input DiPhoton lead (sublead) MVA: " << obj.leadPhotonId() << " " << obj.subLeadPhotonId() << std::endl;
-            }
-            if( reRunRegression_ ) {            
-                if( reRunRegressionOnData_ || ! evt.isRealData() ) { updatePhotonRegressions(*new_obj); }
-                storePhotonRegressions(*new_obj, "afterShShTransf");
-                if( keepInitialEnergy_ ) {
-                    new_obj->getLeadingPhoton().setCorrectedEnergy(reco::Photon::P4type::regression2, leadE, new_obj->leadingPhoton()->sigEOverE()*leadE, true);
-                    new_obj->getSubLeadingPhoton().setCorrectedEnergy(reco::Photon::P4type::regression2, subleadE, new_obj->subLeadingPhoton()->sigEOverE()*subleadE, true);
-                }
-            }
-            
-            float newleadmva = phoTools_.computeMVAWrtVtx( new_obj->getLeadingPhoton(), new_obj->vtx(), rhoFixedGrd, leadCorrectedEtaWidth, eA_leadPho, _phoIsoPtScalingCoeff, _phoIsoCutoff );
-            new_obj->getLeadingPhoton().setPhoIdMvaWrtVtx( new_obj->vtx(), newleadmva);
-            float newsubleadmva = phoTools_.computeMVAWrtVtx( new_obj->getSubLeadingPhoton(), new_obj->vtx(), rhoFixedGrd, subLeadCorrectedEtaWidth,eA_subLeadPho, _phoIsoPtScalingCoeff, _phoIsoCutoff );
-            new_obj->getSubLeadingPhoton().setPhoIdMvaWrtVtx( new_obj->vtx(), newsubleadmva);
-            if (this->debug_) {
-                std::cout << " Output DiPhoton lead (sublead) MVA: " << new_obj->leadPhotonId() << " " << new_obj->subLeadPhotonId() << std::endl;
-            }
-            out_obj->push_back(*new_obj);
-            delete new_obj;
-        }
+        for (const auto & obj : *objects) {}
         evt.put( std::move(out_obj) );
     }
 }

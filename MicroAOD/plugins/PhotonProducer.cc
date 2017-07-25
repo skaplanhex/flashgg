@@ -221,9 +221,9 @@ namespace flashgg {
             double egmMvaValue = (*egmMvaValues)[pp];
             fg.addUserFloat("EGMPhotonMVA", (float) egmMvaValue);
 
-            if( !ConversionTools::hasMatchedPromptElectron( pp->superCluster(), electronHandle, convs, beamspot.position(), lxyMin_, probMin_, nHitsBeforeVtxMax_ ) ) { fg.setPassElectronVeto( true ) ; }
-            else { fg.setPassElectronVeto( false ) ;}
-
+            //if( !ConversionTools::hasMatchedPromptElectron( pp->superCluster(), electronHandle, convs, beamspot.position(), lxyMin_, probMin_, nHitsBeforeVtxMax_ ) ) { fg.setPassElectronVeto( true ) ; }
+            //else { fg.setPassElectronVeto( false ) ;}
+            fg.setPassElectronVeto(false);
             // Gen matching
             if( ! evt.isRealData() ) {
                 unsigned int best = INT_MAX;

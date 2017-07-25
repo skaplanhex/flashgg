@@ -22,11 +22,11 @@ namespace flashgg {
             math::XYZVector p = ( direction.Unit() ) * ( phoPtr_->energy() );
             math::XYZTLorentzVector corrected_p4( p.x(), p.y(), p.z(), phoPtr_->energy() );
 
-            pho_ =  flashgg::Photon( *phoPtr_ );
+            pho_ =  pat::Photon( *phoPtr_ );
             pho_.setP4( corrected_p4 );
             hasPhoton_ = true;
         } else {
-            pho_ = flashgg::Photon( *phoPtr_ );
+            pho_ = pat::Photon( *phoPtr_ );
             hasPhoton_ = true;
         }
         return true;
@@ -42,7 +42,7 @@ namespace flashgg {
         }
     }
 
-    const Photon *SinglePhotonView::photon() const
+    const pat::Photon *SinglePhotonView::photon() const
     {
         if( persistVec_.size() ) {
             return &persistVec_[0];
@@ -52,7 +52,7 @@ namespace flashgg {
         }
     }
 
-    Photon &SinglePhotonView::getPhoton()
+    pat::Photon &SinglePhotonView::getPhoton()
     {
         if( !persistVec_.size() ) {
             throw cms::Exception( "IncorrectUsage" ) << "SinglePhotonView not persistified. If you really want a non-const photon, call MakePersistent()";

@@ -18,8 +18,8 @@ namespace flashgg {
         DiPhotonTagBase( edm::Ptr<DiPhotonCandidate>, edm::Ptr<DiPhotonMVAResult> );
         const edm::Ptr<DiPhotonCandidate> diPhoton() const { return dipho_; }
 
-        const flashgg::Photon *leadingPhoton() const { return dipho_->leadingPhoton(); }
-        const flashgg::Photon *subLeadingPhoton() const { return dipho_->subLeadingPhoton(); }
+        const flashgg::Photon *leadingPhoton() const { return new flashgg::Photon(); }
+        const flashgg::Photon *subLeadingPhoton() const { return new flashgg::Photon(); }
         const flashgg::SinglePhotonView *leadingView() const { return dipho_->leadingView(); }
         const flashgg::SinglePhotonView *subLeadingView() const { return dipho_->subLeadingView(); }
 

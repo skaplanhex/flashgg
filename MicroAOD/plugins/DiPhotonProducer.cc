@@ -32,7 +32,7 @@ namespace flashgg {
     private:
         void produce( Event &, const EventSetup & ) override;
         EDGetTokenT<View<reco::Vertex> > vertexToken_;
-        EDGetTokenT<View<flashgg::Photon> > photonToken_;
+        EDGetTokenT<View<pat::Photon> > photonToken_;
         EDGetTokenT< VertexCandidateMap > vertexCandidateMapToken_;
         unique_ptr<VertexSelectorBase> vertexSelector_;
         EDGetTokenT<View<reco::Conversion> > conversionToken_;
@@ -45,7 +45,7 @@ namespace flashgg {
 
     DiPhotonProducer::DiPhotonProducer( const ParameterSet &iConfig ) :
         vertexToken_( consumes<View<reco::Vertex> >( iConfig.getParameter<InputTag> ( "VertexTag" ) ) ),
-        photonToken_( consumes<View<flashgg::Photon> >( iConfig.getParameter<InputTag> ( "PhotonTag" ) ) ),
+        photonToken_( consumes<View<pat::Photon> >( iConfig.getParameter<InputTag> ( "PhotonTag" ) ) ),
         vertexCandidateMapToken_( consumes<VertexCandidateMap>( iConfig.getParameter<InputTag>( "VertexCandidateMapTag" ) ) ),
         conversionToken_( consumes<View<reco::Conversion> >( iConfig.getParameter<InputTag>( "ConversionTag" ) ) ),
         beamSpotToken_( consumes<reco::BeamSpot >( iConfig.getParameter<InputTag>( "beamSpotTag" ) ) ),
@@ -54,9 +54,12 @@ namespace flashgg {
         genPartToken_( consumes<View<reco::GenParticle> >( iConfig.getParameter<InputTag> ( "GenParticleTag" ) ) )
     {
         const std::string &VertexSelectorName = iConfig.getParameter<std::string>( "VertexSelectorName" );
+        // VertexSelectorBase *vsb = new VertexSelectorBase(iConfig); // already contains the needed VertexSelectorName parameter
+        // vertexSelector_.reset( vsb );
         vertexSelector_.reset( FlashggVertexSelectorFactory::get()->create( VertexSelectorName, iConfig ) );
         useSingleLeg_ = iConfig.getParameter<bool>( "useSingleLeg" );
         produces<vector<flashgg::DiPhotonCandidate> >();
+        produces< vector<pat::Photon> >(); // SK Note: changed this code to return a vector with diphotonColl[0] since that's what's used, and it more easily plugs into the Alabama/Rutgers code.
     }
 
     void DiPhotonProducer::produce( Event &evt, const EventSetup & )
@@ -65,9 +68,9 @@ namespace flashgg {
         evt.getByToken( vertexToken_, primaryVertices );
         // const PtrVector<reco::Vertex>& pvPointers = primaryVertices->ptrVector();
 
-        Handle<View<flashgg::Photon> > photons;
+        Handle<View<pat::Photon> > photons;
         evt.getByToken( photonToken_, photons );
-        //  const PtrVector<flashgg::Photon>& photonPointers = photons->ptrVector();
+        //  const PtrVector<pat::Photon>& photonPointers = photons->ptrVector();
 
         Handle<VertexCandidateMap> vertexCandidateMap;
         evt.getByToken( vertexCandidateMapToken_, vertexCandidateMap );
@@ -107,9 +110,9 @@ namespace flashgg {
 
         for( unsigned int i = 0 ; i < photons->size() ; i++ ) {
 
-            Ptr<flashgg::Photon> pp1 = photons->ptrAt( i );
+            Ptr<pat::Photon> pp1 = photons->ptrAt( i );
             for( unsigned int j = i + 1 ; j < photons->size() ; j++ ) {
-                Ptr<flashgg::Photon> pp2 = photons->ptrAt( j );
+                Ptr<pat::Photon> pp2 = photons->ptrAt( j );
 
                 Ptr<reco::Vertex> pvx = vertexSelector_->select( pp1, pp2, primaryVertices->ptrs(), *vertexCandidateMap, conversions->ptrs(), conversionsSingleLeg->ptrs(),
                                         vertexPoint, useSingleLeg_ );
@@ -136,29 +139,42 @@ namespace flashgg {
         // Sort the final collection (descending) and put it in the event
         std::sort( diPhotonColl->begin(), diPhotonColl->end(), greater<DiPhotonCandidate>() );
 
-        map<unsigned int, unsigned int> vtxidx_jetidx;
-        vtxidx_jetidx[0] = 0; // 0th jet collection index is always the event PV
+        // map<unsigned int, unsigned int> vtxidx_jetidx;
+        // vtxidx_jetidx[0] = 0; // 0th jet collection index is always the event PV
 
-        for( unsigned int i = 0 ; i < diPhotonColl->size() ; i++ ) {
-            for( unsigned int j = 0 ; j < primaryVertices->size() ; j++ ) {
-                if( diPhotonColl->at( i ).vtx() == primaryVertices->ptrAt( j ) ) {
-                    //                    std::cout << " DiPhoton " << i << " (pt=" << diPhotonColl->at( i ).sumPt() << ") matches vertex " << j << std::endl;
-                    if( !vtxidx_jetidx.count( j ) ) {
-                        unsigned int newjetindex = vtxidx_jetidx.size();
-                        //                        std::cout << "   New vertex " << j << " set to jet collection index " << newjetindex << std::endl;
-                        if( newjetindex >= maxJetCollections_ ) {
-                            throw cms::Exception( "Configuration" ) << " We need to setJetCollectionIndex to a value more than MaxJetCollections=" << maxJetCollections_ <<
-                                                                    " -- you must reconfigure and rerun";
-                        }
-                        vtxidx_jetidx[j] = newjetindex;
-                    }
-                    diPhotonColl->at( i ).setJetCollectionIndex( vtxidx_jetidx[j] );
-                    //                    std::cout << "   Set diphoton " << i << " to jet collection index " << vtxidx_jetidx[j] << std::endl;
-                }
-            }
+        // for( unsigned int i = 0 ; i < diPhotonColl->size() ; i++ ) {
+        //     for( unsigned int j = 0 ; j < primaryVertices->size() ; j++ ) {
+        //         if( diPhotonColl->at( i ).vtx() == primaryVertices->ptrAt( j ) ) {
+        //             //                    std::cout << " DiPhoton " << i << " (pt=" << diPhotonColl->at( i ).sumPt() << ") matches vertex " << j << std::endl;
+        //             if( !vtxidx_jetidx.count( j ) ) {
+        //                 unsigned int newjetindex = vtxidx_jetidx.size();
+        //                 //                        std::cout << "   New vertex " << j << " set to jet collection index " << newjetindex << std::endl;
+        //                 if( newjetindex >= maxJetCollections_ ) {
+        //                     throw cms::Exception( "Configuration" ) << " We need to setJetCollectionIndex to a value more than MaxJetCollections=" << maxJetCollections_ <<
+        //                                                             " -- you must reconfigure and rerun";
+        //                 }
+        //                 vtxidx_jetidx[j] = newjetindex;
+        //             }
+        //             diPhotonColl->at( i ).setJetCollectionIndex( vtxidx_jetidx[j] );
+        //             //                    std::cout << "   Set diphoton " << i << " to jet collection index " << vtxidx_jetidx[j] << std::endl;
+        //         }
+        //     }
+        // }
+
+        // SK Note: amending this to add vector with the two photons in diPhotonColl[0]
+        unique_ptr<vector<pat::Photon> > selectedPhotons( new vector<pat::Photon> );
+        // std::vector<pat::Photon> selectedPhotons;
+        if (diPhotonColl->size() > 0){
+            DiPhotonCandidate selectedDiPhotonCand = diPhotonColl->at(0);
+            selectedDiPhotonCand.makePhotonsPersistent();
+            pat::Photon leadingPho = selectedDiPhotonCand.getLeadingPhoton();
+            pat::Photon subLeadingPho = selectedDiPhotonCand.getSubLeadingPhoton();
+            selectedPhotons->push_back(leadingPho);
+            selectedPhotons->push_back(subLeadingPho);
         }
-
         evt.put( std::move( diPhotonColl ) );
+        evt.put( std::move( selectedPhotons ) );
+
     }
 }
 

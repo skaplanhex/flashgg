@@ -30,6 +30,7 @@ namespace flashgg {
         EGammaMinimizer( const ParameterSet & );
     private:
         void produce( Event &, const EventSetup & ) override;
+        EDGetTokenT<View<flashgg::Photon> > photonToken_;
         EDGetTokenT<View<flashgg::DiPhotonCandidate> > diPhotonToken_;
         EDGetTokenT<View<flashgg::Electron> > electronToken_;
         string photonCollectionName_, electronCollectionName_, diPhotonCollectionName_;
@@ -38,6 +39,7 @@ namespace flashgg {
     };
 
     EGammaMinimizer::EGammaMinimizer( const ParameterSet &iConfig ) :
+        photonToken_( consumes<View<flashgg::Photon>>(edm::InputTag("flashggPhotons")) ),
         diPhotonToken_( consumes<View<flashgg::DiPhotonCandidate> >( iConfig.getParameter<InputTag> ( "DiPhotonTag" ) ) ),
         electronToken_( consumes<View<flashgg::Electron> >( iConfig.getParameter<InputTag> ( "ElectronTag" ) ) ),
         photonCollectionName_( iConfig.getParameter<string> ( "PhotonCollectionName" ) ),
@@ -67,6 +69,10 @@ namespace flashgg {
 
     void EGammaMinimizer::produce( Event &evt, const EventSetup & )
     {
+
+        Handle<View<flashgg::Photon> > skPhotonColl;
+        evt.getByToken( photonToken_, skPhotonColl );
+
         Handle<View<DiPhotonCandidate> > diPhotons;
         evt.getByToken( diPhotonToken_, diPhotons );
 
@@ -103,8 +109,9 @@ namespace flashgg {
         for( unsigned int i = 0 ; i < diPhotons->size() ; i++ ) {
             if( debug_ ) { std::cout << "  DiPhoton " << i << std::endl; }
             Ptr<DiPhotonCandidate> oldpdp = diPhotons->ptrAt( i );
-            Ptr<Photon> oldpp1 = oldpdp->leadingView()->originalPhoton();
-            Ptr<Photon> oldpp2 = oldpdp->subLeadingView()->originalPhoton();
+            Ptr<flashgg::Photon> dummyPtr = skPhotonColl->ptrAt(0);
+            Ptr<Photon> oldpp1 = dummyPtr;
+            Ptr<Photon> oldpp2 = dummyPtr;
             Ptr<Photon> pp1;
             Ptr<Photon> pp2;
 

@@ -266,8 +266,8 @@ namespace flashgg {
             if( dipho->leadingPhoton()->pt() < ( dipho->mass() )*leadPhoOverMassThreshold_ ) { continue; }
             if( dipho->subLeadingPhoton()->pt() < ( dipho->mass() )*subleadPhoOverMassThreshold_ ) { continue; }
             //photon mva preselection
-            if( dipho->leadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) <= phoIdMVAThreshold_ ) { continue; }
-            if( dipho->subLeadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) <= phoIdMVAThreshold_ ) { continue; }
+            if( 0. <= phoIdMVAThreshold_ ) { continue; }
+            if( 0. <= phoIdMVAThreshold_ ) { continue; }
             //diphoton MVA preselection
             if( mvares->result < diphoMVAThreshold_ )          { continue; }
 
