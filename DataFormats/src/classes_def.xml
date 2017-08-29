@@ -271,7 +271,8 @@
 <class name="edm::Ptr<flashgg::Electron>"/>
 <class name="std::vector<flashgg::Electron>"/>
 <class name="edm::Wrapper<std::vector<flashgg::Electron> >"/>
-<class name="flashgg::Muon" ClassVersion="13">
+<class name="flashgg::Muon" ClassVersion="14">
+ <version ClassVersion="14" checksum="1872221634"/>
  <version ClassVersion="13" checksum="3043647910"/>
   <version ClassVersion="12" checksum="3130885816"/>
   <version ClassVersion="11" checksum="3269337733"/>

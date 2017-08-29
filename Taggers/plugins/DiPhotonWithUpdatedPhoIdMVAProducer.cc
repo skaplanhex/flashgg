@@ -200,7 +200,7 @@ namespace flashgg {
 
         edm::Handle<double> rhoHandle;
         evt.getByToken( rhoToken_, rhoHandle );
-        const double rhoFixedGrd = *( rhoHandle.product() );
+        // const double rhoFixedGrd = *( rhoHandle.product() );
 
         if( reRunRegression_ ) {
             if( reRunRegressionOnData_ || ! evt.isRealData() ) {
@@ -211,7 +211,7 @@ namespace flashgg {
         
         unique_ptr<std::vector<flashgg::DiPhotonCandidate> > out_obj( new std::vector<flashgg::DiPhotonCandidate>() );
 
-        for (const auto & obj : *objects) {}
+        // for (const auto & obj : *objects) {}
         evt.put( std::move(out_obj) );
     }
 }

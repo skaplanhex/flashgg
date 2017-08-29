@@ -14,7 +14,7 @@
 <use name="MagneticField/Engine"/>
 <use name="root"/>
 <lib name="Geom" />
-<!-- Flags CXXFLAGS="-ggdb"/ -->
+<!-- Flags CXXFLAGS="-ggdb -Werror=unused-variable"/ -->
 <export>
   <lib   name="1"/>
 </export>

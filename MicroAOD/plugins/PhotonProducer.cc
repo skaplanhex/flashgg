@@ -193,7 +193,7 @@ namespace flashgg {
         Handle<reco::BeamSpot> recoBeamSpotHandle;
         evt.getByToken( beamSpotToken_, recoBeamSpotHandle );
 
-        const reco::BeamSpot &beamspot = *recoBeamSpotHandle.product();
+        // const reco::BeamSpot &beamspot = *recoBeamSpotHandle.product();
 
         edm::Handle<edm::ValueMap<float> > egmMvaValues;
         evt.getByToken(egmMvaValuesMapToken_,egmMvaValues);

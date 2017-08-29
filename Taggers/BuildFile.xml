@@ -12,7 +12,7 @@
 <use   name="roofit"/>
 <use   name="roofitcore"/>
 <use   name="boost_python"/>
-<!-- Flags CXXFLAGS="-ggdb"/ -->
+<!-- Flags CXXFLAGS="-ggdb -Werror=unused-variable"/ -->
 <export>
   <lib   name="1"/>
 </export>
