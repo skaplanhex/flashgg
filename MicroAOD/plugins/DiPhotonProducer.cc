@@ -22,6 +22,10 @@
 using namespace edm;
 using namespace std;
 
+bool compareSumPts( const std::pair<double,int>& a, const std::pair<double,int>& b){
+    return a.first > b.first;
+}
+
 namespace flashgg {
 
     class DiPhotonProducer : public EDProducer
@@ -106,8 +110,11 @@ namespace flashgg {
         //const PtrVector<reco::Conversion>& conversionPointersSingleLeg = conversionsSingleLeg->ptrVector();
 
         unique_ptr<vector<DiPhotonCandidate> > diPhotonColl( new vector<DiPhotonCandidate> );
+        unique_ptr<vector<pat::Photon> > selectedPhotons( new vector<pat::Photon> );
 //    cout << "evt.id().event()= " << evt.id().event() << "\tevt.isRealData()= " << evt.isRealData() << "\tphotons->size()= " << photons->size() << "\tprimaryVertices->size()= " << primaryVertices->size() << endl;
 
+        vector< std::pair<double,int> > sumPtVec;
+        int pairNum = 0;
         for( unsigned int i = 0 ; i < photons->size() ; i++ ) {
 
             Ptr<pat::Photon> pp1 = photons->ptrAt( i );
@@ -133,47 +140,50 @@ namespace flashgg {
                 vertexSelector_->writeInfoFromLastSelectionTo( dipho );
 
                 // store the diphoton into the collection
+                dipho.makePhotonsPersistent();
+                sumPtVec.push_back( std::make_pair(pp1->pt() + pp2->pt(),pairNum) );
                 diPhotonColl->push_back( dipho );
+                selectedPhotons->push_back(*pp1);
+                selectedPhotons->push_back(*pp2);
+                pairNum++;
             }
         }
         // Sort the final collection (descending) and put it in the event
         std::sort( diPhotonColl->begin(), diPhotonColl->end(), greater<DiPhotonCandidate>() );
+        // now need to sort the sumPtVec in descending order of sumPt.  The "second" will say which photons from selectedPhotons to put now in the collection to be added to the event
+        std::sort( sumPtVec.begin(), sumPtVec.end(), compareSumPts);
+        unique_ptr<vector<pat::Photon> > selectedPhotons2( new vector<pat::Photon> );
+        for (unsigned int i=0; i < sumPtVec.size(); i++){
+            int idx = sumPtVec.at(i).second;
+            int idxInColl = idx * 2;
+            selectedPhotons2->push_back( selectedPhotons->at(idxInColl) );
+            selectedPhotons2->push_back( selectedPhotons->at(idxInColl+1) );
+        }
 
-        // map<unsigned int, unsigned int> vtxidx_jetidx;
-        // vtxidx_jetidx[0] = 0; // 0th jet collection index is always the event PV
 
-        // for( unsigned int i = 0 ; i < diPhotonColl->size() ; i++ ) {
-        //     for( unsigned int j = 0 ; j < primaryVertices->size() ; j++ ) {
-        //         if( diPhotonColl->at( i ).vtx() == primaryVertices->ptrAt( j ) ) {
-        //             //                    std::cout << " DiPhoton " << i << " (pt=" << diPhotonColl->at( i ).sumPt() << ") matches vertex " << j << std::endl;
-        //             if( !vtxidx_jetidx.count( j ) ) {
-        //                 unsigned int newjetindex = vtxidx_jetidx.size();
-        //                 //                        std::cout << "   New vertex " << j << " set to jet collection index " << newjetindex << std::endl;
-        //                 if( newjetindex >= maxJetCollections_ ) {
-        //                     throw cms::Exception( "Configuration" ) << " We need to setJetCollectionIndex to a value more than MaxJetCollections=" << maxJetCollections_ <<
-        //                                                             " -- you must reconfigure and rerun";
-        //                 }
-        //                 vtxidx_jetidx[j] = newjetindex;
-        //             }
-        //             diPhotonColl->at( i ).setJetCollectionIndex( vtxidx_jetidx[j] );
-        //             //                    std::cout << "   Set diphoton " << i << " to jet collection index " << vtxidx_jetidx[j] << std::endl;
-        //         }
-        //     }
+        // std::cout << "====flashgg DiPhotonProducer====" << std::endl;
+        // for(unsigned int i=0; i < diPhotonColl->size(); i++){
+        //     DiPhotonCandidate selectedDiPhotonCand = diPhotonColl->at(i);
+        //     selectedDiPhotonCand.makePhotonsPersistent();
+        //     pat::Photon leadingPho = selectedDiPhotonCand.getLeadingPhoton();
+        //     pat::Photon subLeadingPho = selectedDiPhotonCand.getSubLeadingPhoton();
+        //     std::cout << "diPhotonColl[" << i << "] (scEta1,scEta2,sumPt): " << leadingPho.superCluster()->eta() << ", " << subLeadingPho.superCluster()->eta() << ", " << selectedDiPhotonCand.sumPt() << std::endl;
         // }
 
+
         // SK Note: amending this to add vector with the two photons in diPhotonColl[0]
-        unique_ptr<vector<pat::Photon> > selectedPhotons( new vector<pat::Photon> );
-        // std::vector<pat::Photon> selectedPhotons;
-        if (diPhotonColl->size() > 0){
-            DiPhotonCandidate selectedDiPhotonCand = diPhotonColl->at(0);
-            selectedDiPhotonCand.makePhotonsPersistent();
-            pat::Photon leadingPho = selectedDiPhotonCand.getLeadingPhoton();
-            pat::Photon subLeadingPho = selectedDiPhotonCand.getSubLeadingPhoton();
-            selectedPhotons->push_back(leadingPho);
-            selectedPhotons->push_back(subLeadingPho);
-        }
+        // unique_ptr<vector<pat::Photon> > selectedPhotons( new vector<pat::Photon> );
+        // // std::vector<pat::Photon> selectedPhotons;
+        // if (diPhotonColl->size() > 0){
+        //     DiPhotonCandidate selectedDiPhotonCand = diPhotonColl->at(0);
+        //     selectedDiPhotonCand.makePhotonsPersistent();
+        //     pat::Photon leadingPho = selectedDiPhotonCand.getLeadingPhoton();
+        //     pat::Photon subLeadingPho = selectedDiPhotonCand.getSubLeadingPhoton();
+        //     selectedPhotons->push_back(leadingPho);
+        //     selectedPhotons->push_back(subLeadingPho);
+        // }
         evt.put( std::move( diPhotonColl ) );
-        evt.put( std::move( selectedPhotons ) );
+        evt.put( std::move( selectedPhotons2 ) );
 
     }
 }
