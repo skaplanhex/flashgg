@@ -141,10 +141,12 @@ namespace flashgg {
 
                 // store the diphoton into the collection
                 dipho.makePhotonsPersistent();
-                sumPtVec.push_back( std::make_pair(pp1->pt() + pp2->pt(),pairNum) );
+                sumPtVec.push_back( std::make_pair(dipho.leadingPhoton()->pt() + dipho.subLeadingPhoton()->pt(),pairNum) );
                 diPhotonColl->push_back( dipho );
-                selectedPhotons->push_back(*pp1);
-                selectedPhotons->push_back(*pp2);
+                // selectedPhotons->push_back(*pp1);
+                // selectedPhotons->push_back(*pp2);
+                selectedPhotons->push_back(*dipho.leadingPhoton());
+                selectedPhotons->push_back(*dipho.subLeadingPhoton());
                 pairNum++;
             }
         }
@@ -153,11 +155,22 @@ namespace flashgg {
         // now need to sort the sumPtVec in descending order of sumPt.  The "second" will say which photons from selectedPhotons to put now in the collection to be added to the event
         std::sort( sumPtVec.begin(), sumPtVec.end(), compareSumPts);
         unique_ptr<vector<pat::Photon> > selectedPhotons2( new vector<pat::Photon> );
+        // std::cout << "====flashgg DiPhotonProducer====" << std::endl;
         for (unsigned int i=0; i < sumPtVec.size(); i++){
             int idx = sumPtVec.at(i).second;
             int idxInColl = idx * 2;
             selectedPhotons2->push_back( selectedPhotons->at(idxInColl) );
             selectedPhotons2->push_back( selectedPhotons->at(idxInColl+1) );
+            // std::cout << "pair# = " << idx << std::endl;
+            // std::cout << "pt1 = " << selectedPhotons->at(idxInColl).pt() << std::endl;
+            // std::cout << "pt2 = " << selectedPhotons->at(idxInColl+1).pt() << std::endl;
+            // std::cout << "sumPt from sumPtVec Photons = " << selectedPhotons->at(idxInColl).pt() + selectedPhotons->at(idxInColl+1).pt() << std::endl;
+            // std::cout << "sumPt from sumPtVec = " << sumPtVec.at(i).first << std::endl;
+            // std::cout << "mass from sumPtVec = " << (selectedPhotons->at(idxInColl).p4() + selectedPhotons->at(idxInColl+1).p4()).M() << std::endl;
+            // std::cout << "sumPt from diPhotonColl = " << diPhotonColl->at(i).sumPt() << std::endl;
+            // std::cout << "mass from diPhotonColl = " << (diPhotonColl->at(i).leadingPhoton()->p4() + diPhotonColl->at(i).subLeadingPhoton()->p4()).M() << std::endl;
+            // std::cout << " " << std::endl;
+
         }
 
 
